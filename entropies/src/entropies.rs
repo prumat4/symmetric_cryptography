@@ -34,26 +34,30 @@ fn main() -> io::Result<()> {
     let file = File::open("../example.txt")?;
     let path = Path::new("../example_processed.txt");
     let display = path.display();
-
+    
     let mut output_file = match File::create(&path) {
         Err(why) => panic!("couldn't create {}: {}", display, why),
         Ok(output_file) => output_file,
     };
-
+    
     let reader = BufReader::new(file);
     let mut text_accumulator = String::new();
-
+    
     for line in reader.lines() {
         let processed_line = preprocess_text(&line?);
         writeln!(output_file, "{}", processed_line)?;
-
+        
         text_accumulator.push_str(&processed_line);
     }
-
+    
     let letter_frequencies = get_letter_frequency(&text_accumulator);
 
-    for (letter, frequency) in letter_frequencies {
-        println!("{}: {}", letter, frequency);
+    let mut sorted_keys: Vec<char> = letter_frequencies.keys().cloned().collect();
+    sorted_keys.sort();
+    for letter in sorted_keys {
+        if let Some(&frequency) = letter_frequencies.get(&letter) {
+            println!("{}: {}", letter, frequency);
+        }
     }
 
     println!("Text preprocessing completed. Processed text saved to {}", display);
