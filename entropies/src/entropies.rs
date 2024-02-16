@@ -3,11 +3,15 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
 
+fn is_cyrillic(c: &char) -> bool {
+    (*c as u32) >= 0x0400 && (*c as u32) <= 0x04FF
+}
+
 fn preprocess_text(text: &str) -> String {
     let mut processed_text = String::new();
 
     for c in text.chars() {
-        if c.is_alphabetic() {
+        if c.is_alphabetic() && is_cyrillic(&c) {
             processed_text.push(c.to_lowercase().next().unwrap());
         } else if c == ' ' {
             if processed_text.ends_with(' ') {
@@ -17,7 +21,7 @@ fn preprocess_text(text: &str) -> String {
         }
     }
 
-    processed_text
+    return processed_text;
 }
 
 fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
@@ -27,7 +31,7 @@ fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
         *frequencies.entry(c).or_insert(0) += 1;
     }
 
-    frequencies
+    return frequencies;
 }
 
 fn main() -> io::Result<()> {
