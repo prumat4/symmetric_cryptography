@@ -58,6 +58,8 @@ fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
     }
 }
 
+// looks awful btw
+// mb try print like a table (or even create a separate text file with this table)?
 fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
     let mut sorted_bigrams: Vec<String> = bigram_frequencies.keys().cloned().collect();
     sorted_bigrams.sort();
@@ -92,7 +94,7 @@ fn main() -> io::Result<()> {
     print_letter_frequencies(&letter_frequencies);
 
     let bigram_frequencies = get_bigram_frequency(&text);
-    print_bigram_frequencies(&bigram_frequencies);
+    // print_bigram_frequencies(&bigram_frequencies);
 
     println!("Text preprocessing completed. Processed text saved to {}", display);
 
