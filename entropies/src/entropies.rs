@@ -7,9 +7,9 @@ fn is_cyrillic(c: &char) -> bool {
     (*c as u32) >= 0x0400 && (*c as u32) <= 0x04FF
 }
 
-fn preprocess_text(text: &str) -> String {
+fn preprocess_text(text: &str) -> Option<String> {
     let mut processed_text = String::new();
-
+    
     for c in text.chars() {
         if c.is_alphabetic() && is_cyrillic(&c) {
             processed_text.push(c.to_lowercase().next().unwrap());
@@ -21,7 +21,11 @@ fn preprocess_text(text: &str) -> String {
         }
     }
 
-    processed_text
+    if processed_text.is_empty() {
+        None
+    } else {
+        Some(processed_text)
+    }
 }
 
 fn remove_spaces(text: &str) -> String {
@@ -225,15 +229,22 @@ fn analyze_file(input_file: &str, output_file: &str, with_spaces: bool) -> io::R
     let mut text = String::new();
     
     for line in reader.lines() {
-        let processed_line: String;
-        if with_spaces {
-            processed_line = preprocess_text(&line?);
-        } else {
-            processed_line = remove_spaces(&line?);
+        let line = line?;
+
+        if !line.trim().is_empty() {
+            let processed_line: Option<String>;
+
+            if with_spaces {
+                processed_line = preprocess_text(&line);
+            } else {
+                processed_line = Some(remove_spaces(&line));
+            }
+            
+            if let Some(processed_line) = processed_line {
+                writeln!(output_file, "{}", processed_line)?;
+                text.push_str(&processed_line);
+            }
         }
-        writeln!(output_file, "{}", processed_line)?;
-        
-        text.push_str(&processed_line);
     }
     
     let letter_frequencies = get_letter_frequency(&text);
