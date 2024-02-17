@@ -61,12 +61,34 @@ fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
 // looks awful btw
 // mb try print like a table (or even create a separate text file with this table)?
 fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
-    let mut sorted_bigrams: Vec<String> = bigram_frequencies.keys().cloned().collect();
-    sorted_bigrams.sort();
-    for bigram in sorted_bigrams {
-        if let Some(&frequency) = bigram_frequencies.get(&bigram) {
-            println!("{}: {}", bigram, frequency);
+    let mut letters: Vec<char> = bigram_frequencies.keys()
+                                                .flat_map(|s| s.chars())
+                                                .collect::<Vec<char>>();
+    
+    letters.sort();
+    letters.dedup();
+
+    print!("  |");
+    for l in &letters {
+        print!("   {} |", l);
+    }
+    println!();
+    for i in 1..202 {
+        print!("_");
+    }
+    println!();
+
+    for l in &letters {
+        print!(" {}|", l);
+        for c in &letters {
+            let key = format!("{}{}", l, c);
+            match bigram_frequencies.get(&key) {
+                Some(&frequency) => print!("{:>5}", frequency),
+                None => print!("{:>5}", 0),
+            }
+            print!("|");
         }
+        println!();
     }
 }
 
@@ -148,8 +170,8 @@ fn compute_h2(bigram_frequencies: &HashMap<String, i64>) -> f64 {
     for (_key, _value) in probabilities {
         h2 += _value * f64::log2(_value);
     }
-
     h2 = -h2/2.0;
+    
     h2
 }
 
@@ -183,7 +205,7 @@ fn main() -> io::Result<()> {
     println!("h1: {}", h1);
 
     let bigram_frequencies = get_bigram_frequency(&text);
-    // print_bigram_frequencies(&bigram_frequencies);
+    print_bigram_frequencies(&bigram_frequencies);
     let h2 = compute_h2(&bigram_frequencies);
     println!("h2: {}", h2);
 
