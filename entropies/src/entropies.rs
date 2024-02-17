@@ -38,9 +38,15 @@ fn get_bigram_frequency(text: &str) -> HashMap<String, i64> {
     let mut frequencies: HashMap<String, i64> = HashMap::new();
 
     let mut chars = text.chars().peekable();
-    while let (Some(curr), Some(next)) = (chars.next(), chars.peek().cloned()) {
+    while let (Some(curr), Some(&next)) = (chars.next(), chars.peek()) {
         if curr.is_alphabetic() && next.is_alphabetic() {
-            let bigram = format!("{}{}", curr.to_lowercase().next().unwrap(), next.to_lowercase().next().unwrap());
+            let bigram = format!("{}{}", curr.to_lowercase(), next.to_lowercase());
+            *frequencies.entry(bigram).or_insert(0) += 1;
+        } else if curr.is_alphabetic() && next.is_whitespace() {
+            let bigram = format!("{} ", curr.to_lowercase());
+            *frequencies.entry(bigram).or_insert(0) += 1;
+        } else if curr.is_whitespace() && next.is_alphabetic() {
+            let bigram = format!(" {}", next.to_lowercase());
             *frequencies.entry(bigram).or_insert(0) += 1;
         }
     }
@@ -65,14 +71,14 @@ fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
     
     letters.sort();
     letters.dedup();
-
+    println!();
     print!("  |");
     for l in &letters {
         print!("   {} |", l);
     }
     println!();
 
-    for i in 1..202 {
+    for i in 1..208 {
         print!("_");
     }
     println!();
@@ -89,6 +95,7 @@ fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
         }
         println!();
     }
+    println!();
 }
 
 fn letters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
@@ -159,14 +166,14 @@ fn print_bigram_probabilities(bigram_frequencies: &HashMap<String, f64>) {
     
     letters.sort();
     letters.dedup();
-
+    println!();
     print!("  |");
     for l in &letters {
         print!("   {} |", l);
     }
     println!();
     
-    for _ in 1..202 {
+    for _ in 1..208 {
         print!("_");
     }
     println!();
@@ -183,6 +190,7 @@ fn print_bigram_probabilities(bigram_frequencies: &HashMap<String, f64>) {
         }
         println!();
     }
+    println!();
 }
 
 fn compute_h2(bigram_frequencies: &HashMap<String, i64>) -> f64 {
