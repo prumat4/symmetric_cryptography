@@ -24,6 +24,10 @@ fn preprocess_text(text: &str) -> String {
     processed_text
 }
 
+fn remove_spaces(text: &str) -> String {
+    text.chars().filter(|&c| c != ' ').collect()
+}
+
 fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     let mut frequencies: HashMap<char, i64> = HashMap::new();
 
@@ -34,66 +38,13 @@ fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     frequencies
 }
 
-fn get_bigram_frequency(text: &str) -> HashMap<String, i64> {
-    let mut frequencies: HashMap<String, i64> = HashMap::new();
-
-    let mut chars = text.chars().peekable();
-    while let (Some(curr), Some(&next)) = (chars.next(), chars.peek()) {
-        if curr.is_alphabetic() && next.is_alphabetic() {
-            let bigram = format!("{}{}", curr.to_lowercase(), next.to_lowercase());
-            *frequencies.entry(bigram).or_insert(0) += 1;
-        } else if curr.is_alphabetic() && next.is_whitespace() {
-            let bigram = format!("{} ", curr.to_lowercase());
-            *frequencies.entry(bigram).or_insert(0) += 1;
-        } else if curr.is_whitespace() && next.is_alphabetic() {
-            let bigram = format!(" {}", next.to_lowercase());
-            *frequencies.entry(bigram).or_insert(0) += 1;
-        }
-    }
-
-    frequencies
-}
-
 fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
-        let mut sorted_letters: Vec<char> = letter_frequencies.keys().cloned().collect();
-        sorted_letters.sort();
-        for letter in sorted_letters {
+    let mut sorted_letters: Vec<char> = letter_frequencies.keys().cloned().collect();
+    sorted_letters.sort();
+    for letter in sorted_letters {
         if let Some(&frequency) = letter_frequencies.get(&letter) {
             println!("{}: {}", letter, frequency);
         }
-    }
-}
-
-fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
-    let mut letters: Vec<char> = bigram_frequencies.keys()
-                                                .flat_map(|s| s.chars())
-                                                .collect::<Vec<char>>();
-    
-    letters.sort();
-    letters.dedup();
-    println!();
-    print!("  |");
-    for l in &letters {
-        print!("   {} |", l);
-    }
-    println!();
-
-    for i in 1..208 {
-        print!("_");
-    }
-    println!();
-
-    for l in &letters {
-        print!(" {}|", l);
-        for c in &letters {
-            let key = format!("{}{}", l, c);
-            match bigram_frequencies.get(&key) {
-                Some(&frequency) => print!("{:>5}", frequency),
-                None => print!("{:>5}", 0),
-            }
-            print!("|");
-        }
-        println!();
     }
     println!();
 }
@@ -125,6 +76,7 @@ fn print_letters_probabilities(probabilities: &HashMap<char, f64>) {
             println!("{}: {}", letter, frequency);
         }
     }
+    println!();
 }
 
 fn compute_h1(letter_frequencies: &HashMap<char, i64>) -> f64 {
@@ -137,6 +89,60 @@ fn compute_h1(letter_frequencies: &HashMap<char, i64>) -> f64 {
 
     h1 = -h1;
     h1
+}
+
+fn get_bigram_frequency(text: &str) -> HashMap<String, i64> {
+    let mut frequencies: HashMap<String, i64> = HashMap::new();
+
+    let mut chars = text.chars().peekable();
+    while let (Some(curr), Some(&next)) = (chars.next(), chars.peek()) {
+        if curr.is_alphabetic() && next.is_alphabetic() {
+            let bigram = format!("{}{}", curr.to_lowercase(), next.to_lowercase());
+            *frequencies.entry(bigram).or_insert(0) += 1;
+        } else if curr.is_alphabetic() && next.is_whitespace() {
+            let bigram = format!("{} ", curr.to_lowercase());
+            *frequencies.entry(bigram).or_insert(0) += 1;
+        } else if curr.is_whitespace() && next.is_alphabetic() {
+            let bigram = format!(" {}", next.to_lowercase());
+            *frequencies.entry(bigram).or_insert(0) += 1;
+        }
+    }
+
+    frequencies
+}
+
+fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
+    let mut letters: Vec<char> = bigram_frequencies.keys()
+                                                .flat_map(|s| s.chars())
+                                                .collect::<Vec<char>>();
+    
+    letters.sort();
+    letters.dedup();
+    println!();
+    print!("  |");
+    for l in &letters {
+        print!("   {} |", l);
+    }
+    println!();
+
+    for _i in 1..208 {
+        print!("_");
+    }
+    println!();
+
+    for l in &letters {
+        print!(" {}|", l);
+        for c in &letters {
+            let key = format!("{}{}", l, c);
+            match bigram_frequencies.get(&key) {
+                Some(&frequency) => print!("{:>5}", frequency),
+                None => print!("{:>5}", 0),
+            }
+            print!("|");
+        }
+        println!();
+    }
+    println!();
 }
 
 fn bigram_count(bigram_frequencies: &HashMap<String, i64>) -> i64 {
@@ -205,9 +211,9 @@ fn compute_h2(bigram_frequencies: &HashMap<String, i64>) -> f64 {
     h2
 }
 
-fn main() -> io::Result<()> {
-    let file = File::open("../example.txt")?;
-    let path = Path::new("../example_processed.txt");
+fn analyze_file(input_file: &str, output_file: &str, with_spaces: bool) -> io::Result<()> {
+    let file = File::open(input_file)?;
+    let path = Path::new(output_file);
     let display = path.display();
     
     let mut output_file = match File::create(&path) {
@@ -219,13 +225,17 @@ fn main() -> io::Result<()> {
     let mut text = String::new();
     
     for line in reader.lines() {
-        let processed_line = preprocess_text(&line?);
+        let processed_line: String;
+        if with_spaces {
+            processed_line = preprocess_text(&line?);
+        } else {
+            processed_line = remove_spaces(&line?);
+        }
         writeln!(output_file, "{}", processed_line)?;
         
         text.push_str(&processed_line);
     }
     
-
     let letter_frequencies = get_letter_frequency(&text);
     print_letter_frequencies(&letter_frequencies);
     let letter_prob = count_letters_probabilities(&letter_frequencies);
@@ -241,7 +251,21 @@ fn main() -> io::Result<()> {
     let h2 = compute_h2(&bigram_frequencies);
     println!("h2: {}", h2);
 
-    println!("Text preprocessing completed. Processed text saved to {}", display);
+    println!("File analyzing completed. Processed text saved to {}", display);
+
+    Ok(())
+}
+
+fn main() -> io::Result<()> {
+    let input_file = "../boloto.txt";
+    let processed_file = "../boloto_processed.txt";
+    let without_spaces_file = "../boloto_without_spaces.txt";
+    let mut with_spaces = true;
+
+    let _ = analyze_file(input_file, processed_file, with_spaces);
+    
+    with_spaces = false;
+    let _ = analyze_file(processed_file, without_spaces_file, with_spaces);
 
     Ok(())
 }
