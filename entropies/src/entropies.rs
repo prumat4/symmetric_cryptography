@@ -92,9 +92,9 @@ fn count_letters_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashM
 fn print_letters_probabilities(probabilities: &HashMap<char, f64>) {
     let mut sorted_probabilities: Vec<char> = probabilities.keys().cloned().collect();
     sorted_probabilities.sort();
-    for bigram in sorted_probabilities {
-        if let Some(&frequency) = probabilities.get(&bigram) {
-            println!("{}: {}", bigram, frequency);
+    for letter in sorted_probabilities {
+        if let Some(&frequency) = probabilities.get(&letter) {
+            println!("{}: {}", letter, frequency);
         }
     }
 }
@@ -109,6 +109,48 @@ fn compute_h1(letter_frequencies: &HashMap<char, i64>) -> f64 {
 
     h1 = -h1;
     h1
+}
+
+fn bigram_count(bigram_frequencies: &HashMap<String, i64>) -> i64 {
+    let mut count = 0;
+    for (_key, _value) in bigram_frequencies {
+        count += _value;
+    }
+
+    count
+}
+
+fn count_bigram_probabilities(bigram_frequencies: &HashMap<String, i64>) -> HashMap<String, f64> {
+    let mut probabilities: HashMap<String, f64> = HashMap::new();
+    let number_of_bigrams = bigram_count(bigram_frequencies) as f64;
+
+    for (_key, _value) in bigram_frequencies {
+        probabilities.insert(_key.clone(), (*_value as f64) / number_of_bigrams);
+    }
+
+    probabilities
+}
+
+fn print_bigram_probabilities(probabilities: &HashMap<String, f64>) {
+    let mut sorted_probabilities: Vec<String> = probabilities.keys().cloned().collect();
+    sorted_probabilities.sort();
+    for bigram in sorted_probabilities {
+        if let Some(&frequency) = probabilities.get(&bigram) {
+            println!("{}: {}", bigram, frequency);
+        }
+    }
+}
+
+fn compute_h2(bigram_frequencies: &HashMap<String, i64>) -> f64 {
+    let mut h2 = 0.0;
+    let probabilities = count_bigram_probabilities(&bigram_frequencies);
+
+    for (_key, _value) in probabilities {
+        h2 += _value * f64::log2(_value);
+    }
+
+    h2 = -h2/2.0;
+    h2
 }
 
 fn main() -> io::Result<()> {
@@ -140,8 +182,10 @@ fn main() -> io::Result<()> {
     let h1 = compute_h1(&letter_frequencies);
     println!("h1: {}", h1);
 
-    // let bigram_frequencies = get_bigram_frequency(&text);
+    let bigram_frequencies = get_bigram_frequency(&text);
     // print_bigram_frequencies(&bigram_frequencies);
+    let h2 = compute_h2(&bigram_frequencies);
+    println!("h2: {}", h2);
 
     println!("Text preprocessing completed. Processed text saved to {}", display);
 
