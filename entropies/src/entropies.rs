@@ -43,12 +43,10 @@ fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
 }
 
 fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
-    let mut sorted_letters: Vec<char> = letter_frequencies.keys().cloned().collect();
-    sorted_letters.sort();
-    for letter in sorted_letters {
-        if let Some(&frequency) = letter_frequencies.get(&letter) {
-            println!("{}: {}", letter, frequency);
-        }
+    let mut sorted_frequencies: Vec<(&char, &i64)> = letter_frequencies.iter().collect();
+    sorted_frequencies.sort_by_key(|&(_, frequency)| *frequency);
+    for (&letter, &frequency) in sorted_frequencies.iter().rev() {
+        println!("{}: {}", letter, frequency);
     }
     println!();
 }
@@ -73,12 +71,10 @@ fn count_letters_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashM
 }
 
 fn print_letters_probabilities(probabilities: &HashMap<char, f64>) {
-    let mut sorted_probabilities: Vec<char> = probabilities.keys().cloned().collect();
-    sorted_probabilities.sort();
-    for letter in sorted_probabilities {
-        if let Some(&frequency) = probabilities.get(&letter) {
-            println!("{}: {}", letter, frequency);
-        }
+    let mut sorted_probabilities: Vec<(&char, &f64)> = probabilities.iter().collect();
+    sorted_probabilities.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap());
+    for (&letter, &probability) in sorted_probabilities {
+        println!("{}: {}", letter, probability);
     }
     println!();
 }
