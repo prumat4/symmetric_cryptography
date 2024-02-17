@@ -58,8 +58,6 @@ fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
     }
 }
 
-// looks awful btw
-// mb try print like a table (or even create a separate text file with this table)?
 fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
     let mut letters: Vec<char> = bigram_frequencies.keys()
                                                 .flat_map(|s| s.chars())
@@ -73,6 +71,7 @@ fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
         print!("   {} |", l);
     }
     println!();
+
     for i in 1..202 {
         print!("_");
     }
@@ -153,13 +152,36 @@ fn count_bigram_probabilities(bigram_frequencies: &HashMap<String, i64>) -> Hash
     probabilities
 }
 
-fn print_bigram_probabilities(probabilities: &HashMap<String, f64>) {
-    let mut sorted_probabilities: Vec<String> = probabilities.keys().cloned().collect();
-    sorted_probabilities.sort();
-    for bigram in sorted_probabilities {
-        if let Some(&frequency) = probabilities.get(&bigram) {
-            println!("{}: {}", bigram, frequency);
+fn print_bigram_probabilities(bigram_frequencies: &HashMap<String, f64>) {
+    let mut letters: Vec<char> = bigram_frequencies.keys()
+                                                .flat_map(|s| s.chars())
+                                                .collect::<Vec<char>>();
+    
+    letters.sort();
+    letters.dedup();
+
+    print!("  |");
+    for l in &letters {
+        print!("   {} |", l);
+    }
+    println!();
+    
+    for _ in 1..202 {
+        print!("_");
+    }
+    println!();
+
+    for l in &letters {
+        print!(" {}|", l);
+        for c in &letters {
+            let key = format!("{}{}", l, c);
+            match bigram_frequencies.get(&key) {
+                Some(&frequency) => print!("{:>5.3}", frequency),
+                None => print!("{:>5.3}", 0.0),
+            }
+            print!("|");
         }
+        println!();
     }
 }
 
@@ -195,17 +217,19 @@ fn main() -> io::Result<()> {
         text.push_str(&processed_line);
     }
     
+
     let letter_frequencies = get_letter_frequency(&text);
-    // print_letter_frequencies(&letter_frequencies);
-
-    // let prob = count_probabilities(&letter_frequencies);
-    // print_probabilities(&prob);
-
+    print_letter_frequencies(&letter_frequencies);
+    let letter_prob = count_letters_probabilities(&letter_frequencies);
+    print_letters_probabilities(&letter_prob);
     let h1 = compute_h1(&letter_frequencies);
     println!("h1: {}", h1);
 
+
     let bigram_frequencies = get_bigram_frequency(&text);
     print_bigram_frequencies(&bigram_frequencies);
+    let bigram_prob = count_bigram_probabilities(&bigram_frequencies);
+    print_bigram_probabilities(&bigram_prob);
     let h2 = compute_h2(&bigram_frequencies);
     println!("h2: {}", h2);
 
