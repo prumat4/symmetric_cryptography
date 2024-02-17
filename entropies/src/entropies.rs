@@ -70,7 +70,7 @@ fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
     }
 }
 
-fn characters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
+fn letters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
     let mut count = 0;
     for (_key, _value) in letter_frequencies {
         count += _value;
@@ -79,9 +79,9 @@ fn characters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
     count
 }
 
-fn count_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashMap<char, f64> {
+fn count_letters_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashMap<char, f64> {
     let mut probabilities: HashMap<char, f64> = HashMap::new();
-    let number_of_characters = characters_count(letter_frequencies) as f64;
+    let number_of_characters = letters_count(letter_frequencies) as f64;
 
     for (_key, _value) in letter_frequencies {
         probabilities.insert(*_key, (*_value as f64) / number_of_characters);
@@ -89,7 +89,7 @@ fn count_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashMap<char,
     probabilities
 }
 
-fn print_probabilities(probabilities: &HashMap<char, f64>) {
+fn print_letters_probabilities(probabilities: &HashMap<char, f64>) {
     let mut sorted_probabilities: Vec<char> = probabilities.keys().cloned().collect();
     sorted_probabilities.sort();
     for bigram in sorted_probabilities {
@@ -101,7 +101,7 @@ fn print_probabilities(probabilities: &HashMap<char, f64>) {
 
 fn compute_h1(letter_frequencies: &HashMap<char, i64>) -> f64 {
     let mut h1 = 0.0;
-    let probabilities = count_probabilities(&letter_frequencies);
+    let probabilities = count_letters_probabilities(&letter_frequencies);
 
     for (_key, _value) in probabilities {
         h1 += _value * f64::log2(_value);
