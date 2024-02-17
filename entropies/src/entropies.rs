@@ -21,7 +21,7 @@ fn preprocess_text(text: &str) -> String {
         }
     }
 
-    return processed_text;
+    processed_text
 }
 
 fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
@@ -31,7 +31,7 @@ fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
         *frequencies.entry(c).or_insert(0) += 1;
     }
 
-    return frequencies;
+    frequencies
 }
 
 fn get_bigram_frequency(text: &str) -> HashMap<String, i64> {
@@ -45,13 +45,13 @@ fn get_bigram_frequency(text: &str) -> HashMap<String, i64> {
         }
     }
 
-    return frequencies;
+    frequencies
 }
 
 fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
-    let mut sorted_letters: Vec<char> = letter_frequencies.keys().cloned().collect();
-    sorted_letters.sort();
-    for letter in sorted_letters {
+        let mut sorted_letters: Vec<char> = letter_frequencies.keys().cloned().collect();
+        sorted_letters.sort();
+        for letter in sorted_letters {
         if let Some(&frequency) = letter_frequencies.get(&letter) {
             println!("{}: {}", letter, frequency);
         }
@@ -68,6 +68,47 @@ fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
             println!("{}: {}", bigram, frequency);
         }
     }
+}
+
+fn characters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
+    let mut count = 0;
+    for (_key, _value) in letter_frequencies {
+        count += _value;
+    }
+
+    count
+}
+
+fn count_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashMap<char, f64> {
+    let mut probabilities: HashMap<char, f64> = HashMap::new();
+    let number_of_characters = characters_count(letter_frequencies) as f64;
+
+    for (_key, _value) in letter_frequencies {
+        probabilities.insert(*_key, (*_value as f64) / number_of_characters);
+    }
+    probabilities
+}
+
+fn print_probabilities(probabilities: &HashMap<char, f64>) {
+    let mut sorted_probabilities: Vec<char> = probabilities.keys().cloned().collect();
+    sorted_probabilities.sort();
+    for bigram in sorted_probabilities {
+        if let Some(&frequency) = probabilities.get(&bigram) {
+            println!("{}: {}", bigram, frequency);
+        }
+    }
+}
+
+fn compute_h1(letter_frequencies: &HashMap<char, i64>) -> f64 {
+    let mut h1 = 0.0;
+    let probabilities = count_probabilities(&letter_frequencies);
+
+    for (_key, _value) in probabilities {
+        h1 += _value * f64::log2(_value);
+    }
+
+    h1 = -h1;
+    h1
 }
 
 fn main() -> io::Result<()> {
@@ -91,9 +132,15 @@ fn main() -> io::Result<()> {
     }
     
     let letter_frequencies = get_letter_frequency(&text);
-    print_letter_frequencies(&letter_frequencies);
+    // print_letter_frequencies(&letter_frequencies);
 
-    let bigram_frequencies = get_bigram_frequency(&text);
+    // let prob = count_probabilities(&letter_frequencies);
+    // print_probabilities(&prob);
+
+    let h1 = compute_h1(&letter_frequencies);
+    println!("h1: {}", h1);
+
+    // let bigram_frequencies = get_bigram_frequency(&text);
     // print_bigram_frequencies(&bigram_frequencies);
 
     println!("Text preprocessing completed. Processed text saved to {}", display);
