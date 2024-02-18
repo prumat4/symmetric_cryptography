@@ -3,34 +3,38 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
 
-fn is_cyrillic(c: &char) -> bool {
-    (*c as u32) >= 0x0400 && (*c as u32) <= 0x04FF
-}
+mod utils;
+use crate::utils::{preprocess_text, remove_spaces}; // Adjust function_name1, function_name2 accordingly
 
-fn preprocess_text(text: &str) -> Option<String> {
-    let mut processed_text = String::new();
+
+// fn is_cyrillic(c: &char) -> bool {
+//     (*c as u32) >= 0x0400 && (*c as u32) <= 0x04FF
+// }
+
+// fn preprocess_text(text: &str) -> Option<String> {
+//     let mut processed_text = String::new();
     
-    for c in text.chars() {
-        if c.is_alphabetic() && is_cyrillic(&c) {
-            processed_text.push(c.to_lowercase().next().unwrap());
-        } else if c == ' ' {
-            if processed_text.ends_with(' ') {
-                continue;
-            }
-            processed_text.push(c);
-        }
-    }
+//     for c in text.chars() {
+//         if c.is_alphabetic() && is_cyrillic(&c) {
+//             processed_text.push(c.to_lowercase().next().unwrap());
+//         } else if c == ' ' {
+//             if processed_text.ends_with(' ') {
+//                 continue;
+//             }
+//             processed_text.push(c);
+//         }
+//     }
 
-    if processed_text.is_empty() {
-        None
-    } else {
-        Some(processed_text)
-    }
-}
+//     if processed_text.is_empty() {
+//         None
+//     } else {
+//         Some(processed_text)
+//     }
+// }
 
-fn remove_spaces(text: &str) -> String {
-    text.chars().filter(|&c| c != ' ').collect()
-}
+// fn remove_spaces(text: &str) -> String {
+//     text.chars().filter(|&c| c != ' ').collect()
+// }
 
 fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     let mut frequencies: HashMap<char, i64> = HashMap::new();
@@ -264,9 +268,9 @@ fn analyze_file(input_file: &str, output_file: &str, with_spaces: bool) -> io::R
 }
 
 fn main() -> io::Result<()> {
-    let input_file = "../boloto.txt";
-    let processed_file = "../boloto_processed.txt";
-    let without_spaces_file = "../boloto_without_spaces.txt";
+    let input_file = "../text_files/entropy/boloto.txt";
+    let processed_file = "../text_files/entropy/boloto_processed.txt";
+    let without_spaces_file = "../text_files/entropy/boloto_without_spaces.txt";
     let mut with_spaces = true;
 
     let _ = analyze_file(input_file, processed_file, with_spaces);
