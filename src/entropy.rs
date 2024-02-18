@@ -5,8 +5,8 @@ use std::path::Path;
 
 mod utils;
 use crate::utils::{preprocess_text, remove_spaces};
+use crate::utils::{print_letter_frequencies, print_letters_probabilities};
 use crate::utils::{print_bigram_frequencies, print_bigram_probabilities};
-use crate::utils::{print_letters_probabilities, print_letter_frequencies};
 
 fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     let mut frequencies: HashMap<char, i64> = HashMap::new();
