@@ -4,7 +4,9 @@ use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
 
 mod utils;
-use crate::utils::{preprocess_text, remove_spaces, is_cyrillic}; 
+use crate::utils::{preprocess_text, remove_spaces};
+use crate::utils::{print_bigram_frequencies, print_bigram_probabilities};
+use crate::utils::{print_letters_probabilities, print_letter_frequencies};
 
 fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     let mut frequencies: HashMap<char, i64> = HashMap::new();
@@ -14,15 +16,6 @@ fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     }
 
     frequencies
-}
-
-fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
-    let mut sorted_frequencies: Vec<(&char, &i64)> = letter_frequencies.iter().collect();
-    sorted_frequencies.sort_by_key(|&(_, frequency)| *frequency);
-    for (&letter, &frequency) in sorted_frequencies.iter().rev() {
-        println!("{}: {}", letter, frequency);
-    }
-    println!();
 }
 
 fn letters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
@@ -44,14 +37,6 @@ fn count_letters_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashM
     probabilities
 }
 
-fn print_letters_probabilities(probabilities: &HashMap<char, f64>) {
-    let mut sorted_probabilities: Vec<(&char, &f64)> = probabilities.iter().collect();
-    sorted_probabilities.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap());
-    for (&letter, &probability) in sorted_probabilities {
-        println!("{}: {}", letter, probability);
-    }
-    println!();
-}
 
 fn compute_h1(letter_frequencies: &HashMap<char, i64>) -> f64 {
     let mut h1 = 0.0;
@@ -85,40 +70,6 @@ fn get_bigram_frequency(text: &str) -> HashMap<String, i64> {
     frequencies
 }
 
-fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
-    let mut letters: Vec<char> = bigram_frequencies.keys()
-                                                .flat_map(|s| s.chars())
-                                                .collect::<Vec<char>>();
-    
-    letters.sort();
-    letters.dedup();
-    println!();
-    print!("  |");
-    for l in &letters {
-        print!("   {} |", l);
-    }
-    println!();
-
-    for _i in 1..208 {
-        print!("_");
-    }
-    println!();
-
-    for l in &letters {
-        print!(" {}|", l);
-        for c in &letters {
-            let key = format!("{}{}", l, c);
-            match bigram_frequencies.get(&key) {
-                Some(&frequency) => print!("{:>5}", frequency),
-                None => print!("{:>5}", 0),
-            }
-            print!("|");
-        }
-        println!();
-    }
-    println!();
-}
-
 fn bigram_count(bigram_frequencies: &HashMap<String, i64>) -> i64 {
     let mut count = 0;
     for (_key, _value) in bigram_frequencies {
@@ -137,40 +88,6 @@ fn count_bigram_probabilities(bigram_frequencies: &HashMap<String, i64>) -> Hash
     }
 
     probabilities
-}
-
-fn print_bigram_probabilities(bigram_frequencies: &HashMap<String, f64>) {
-    let mut letters: Vec<char> = bigram_frequencies.keys()
-                                                .flat_map(|s| s.chars())
-                                                .collect::<Vec<char>>();
-    
-    letters.sort();
-    letters.dedup();
-    println!();
-    print!("  |");
-    for l in &letters {
-        print!("   {} |", l);
-    }
-    println!();
-    
-    for _ in 1..208 {
-        print!("_");
-    }
-    println!();
-
-    for l in &letters {
-        print!(" {}|", l);
-        for c in &letters {
-            let key = format!("{}{}", l, c);
-            match bigram_frequencies.get(&key) {
-                Some(&frequency) => print!("{:>5.3}", frequency),
-                None => print!("{:>5.3}", 0.0),
-            }
-            print!("|");
-        }
-        println!();
-    }
-    println!();
 }
 
 fn compute_h2(bigram_frequencies: &HashMap<String, i64>) -> f64 {
