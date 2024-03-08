@@ -5,17 +5,14 @@ use std::path::Path;
 mod utils;
 use crate::utils::{process_file};
 
-fn encode_char(c: char, key_char: char) -> u32 {
-    // let mut ans = (c as u32 - 'а' as u32) + (key_char as u32 );
+fn encode_char(c: char, key_char: char) -> char {
+    let mut ans = (c as u32) + (key_char as u32) - 'а' as u32 - 'а' as u32;
+    if ans > 31 {
+        ans = ans - 31;
+    }
 
-    let a = c as u32;
-    print!("{} ", a);
-    
-    let b = key_char as u32;
-    print!("{} ", b);
-
-    let ans = 23;
-    ans
+    ans = ans + 'а' as u32;
+    char::from_u32(ans).unwrap_or('і')
 }
 
 fn vigenere_encode(input_file: &str, encoded_file: &str, key: &str) -> io::Result<()> {
@@ -38,8 +35,7 @@ fn vigenere_encode(input_file: &str, encoded_file: &str, key: &str) -> io::Resul
         
         for c in line.chars() {
             let key_char = key_chars[key_index % key_chars.len()];
-            
-            let encoded_char = ((c as u8 - 'а' as u8) + (key_char as u8 )) as char;
+            let encoded_char = encode_char(c, key_char);
             let mut e = c as u32;
             encoded_line.push(encoded_char);
             key_index += 1;
@@ -59,8 +55,7 @@ fn main() -> io::Result<()> {
     let encoded_file = "../text_files/vigenere_cipher/encoded.txt";
     
     let processed_text = process_file(input_file, preprocessed_file, false);
-    let key = "абвгдежзийклмня";
+    let key = "агдзя";
     let _ = vigenere_encode(preprocessed_file, encoded_file, key);
-
     Ok(())
 }

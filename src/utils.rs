@@ -29,7 +29,7 @@ pub fn preprocess_text(text: &str) -> Option<String> {
 }
 
 pub fn remove_spaces(text: &str) -> String {
-    text.chars().filter(|&c| c != ' ').collect()
+    text.chars().filter(|&c| c != ' ' && c != '\n' && c != '\0').collect()
 }
 
 pub fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
