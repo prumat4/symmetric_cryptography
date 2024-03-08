@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::io::{self, BufRead, BufReader, Write};
+use File;
+use Path;
 
 pub fn is_cyrillic(c: &char) -> bool {
     (*c as u32) >= 0x0400 && (*c as u32) <= 0x04FF
@@ -113,4 +116,39 @@ pub fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
         println!("{}: {}", letter, frequency);
     }
     println!();
+}
+
+pub fn process_file(input_file: &str, output_file: &str, with_spaces: bool) -> io::Result<String> {
+    let file = File::open(input_file)?;
+    let path = Path::new(output_file);
+    let display = path.display();
+    
+    let mut output_file = match File::create(&path) {
+        Err(why) => panic!("couldn't create {}: {}", display, why),
+        Ok(output_file) => output_file,
+    };
+    
+    let reader = BufReader::new(file);
+    let mut processed_text = String::new();
+    
+    for line in reader.lines() {
+        let line = line?;
+
+        if !line.trim().is_empty() {
+            let processed_line: Option<String>;
+
+            if with_spaces {
+                processed_line = preprocess_text(&line);
+            } else {
+                processed_line = Some(remove_spaces(&line));
+            }
+            
+            if let Some(processed_line) = processed_line {
+                writeln!(output_file, "{}", processed_line)?;
+                processed_text.push_str(&processed_line);
+            }
+        }
+    }
+    
+    Ok(processed_text)
 }

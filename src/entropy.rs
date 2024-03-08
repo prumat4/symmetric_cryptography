@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Write};
+use std::io::{self};
 use std::path::Path;
 
 mod utils;
-use crate::utils::{preprocess_text, remove_spaces};
+use crate::utils::{process_file};
 use crate::utils::{print_letter_frequencies, print_letters_probabilities};
 use crate::utils::{print_bigram_frequencies, print_bigram_probabilities};
 
@@ -103,54 +103,23 @@ fn compute_h2(bigram_frequencies: &HashMap<String, i64>) -> f64 {
 }
 
 fn analyze_file(input_file: &str, output_file: &str, with_spaces: bool) -> io::Result<()> {
-    let file = File::open(input_file)?;
-    let path = Path::new(output_file);
-    let display = path.display();
-    
-    let mut output_file = match File::create(&path) {
-        Err(why) => panic!("couldn't create {}: {}", display, why),
-        Ok(output_file) => output_file,
-    };
-    
-    let reader = BufReader::new(file);
-    let mut text = String::new();
-    
-    for line in reader.lines() {
-        let line = line?;
+    let processed_text = process_file(input_file, output_file, with_spaces)?;
 
-        if !line.trim().is_empty() {
-            let processed_line: Option<String>;
-
-            if with_spaces {
-                processed_line = preprocess_text(&line);
-            } else {
-                processed_line = Some(remove_spaces(&line));
-            }
-            
-            if let Some(processed_line) = processed_line {
-                writeln!(output_file, "{}", processed_line)?;
-                text.push_str(&processed_line);
-            }
-        }
-    }
-    
-    let letter_frequencies = get_letter_frequency(&text);
+    let letter_frequencies = get_letter_frequency(&processed_text);
     print_letter_frequencies(&letter_frequencies);
     let letter_prob = count_letters_probabilities(&letter_frequencies);
     print_letters_probabilities(&letter_prob);
     let h1 = compute_h1(&letter_frequencies);
     println!("h1: {}", h1);
 
-
-    let bigram_frequencies = get_bigram_frequency(&text);
+    let bigram_frequencies = get_bigram_frequency(&processed_text);
     print_bigram_frequencies(&bigram_frequencies);
     let bigram_prob = count_bigram_probabilities(&bigram_frequencies);
     print_bigram_probabilities(&bigram_prob);
     let h2 = compute_h2(&bigram_frequencies);
     println!("h2: {}", h2);
 
-    println!("File analyzing completed. Processed text saved to {}", display);
-
+    println!("File analyzing completed. Processed text saved to {}", output_file);
     Ok(())
 }
 
