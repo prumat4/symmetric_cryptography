@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
+use std::fs;
 
 mod utils;
 use crate::utils::{process_file};
@@ -41,11 +42,45 @@ fn vigenere_encode(input_text: &str, encoded_file: &str, key: &str) -> io::Resul
     Ok(())
 }
 
+fn i_m_theoretical(probabilities: Vec<f64>) -> f64 {
+    let mut I_m = 0.0;
+    
+    for prob in probabilities {
+        I_m += prob * prob;
+    }
+
+    I_m
+}
+
+fn coincidence(input_text: &str, alphabet: &str) -> f64 {
+    let text: Vec<char> = input_text.chars().collect();
+    let mut sum: usize = 0;
+
+    for c in alphabet.chars() {
+        let occurrences = text.iter().filter(|&&x| x == c).count();
+        sum = sum.checked_add(occurrences.checked_mul(occurrences.checked_sub(1).unwrap_or(0)).unwrap_or(0)).unwrap_or(0);
+    }
+
+    let text_len = text.len();
+    let denominator = (text_len.checked_mul(text_len.checked_sub(1).unwrap_or(0)).unwrap_or(0)) as f64;
+
+    (sum as f64) / denominator
+}
+
 fn main() -> io::Result<()> {
+    let alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+    let probabilities: Vec<f64> = vec![
+        0.08143, 0.01667, 0.04604, 0.01632, 0.03084, 0.08027, 0.00150, 0.00884,
+        0.01507, 0.07563, 0.01200, 0.03374, 0.03952, 0.03270, 0.06503, 0.11143,
+        0.02931, 0.04774, 0.05482, 0.06829, 0.02647, 0.00310, 0.00827, 0.00455,
+        0.01458, 0.00681, 0.00330, 0.01808, 0.01752, 0.00425, 0.00735, 0.01818,
+        0.00036,
+    ];
+
     let input_file = "../text_files/vigenere_cipher/input.txt";
     let preprocessed_file = "../text_files/vigenere_cipher/preprocessed.txt";
     let processed_text = process_file(input_file, preprocessed_file, false)?;
-
+    
     let keys: [(&str, i8); 6] = [
         ("оф", 2),
         ("енз", 3),
@@ -62,6 +97,27 @@ fn main() -> io::Result<()> {
         );
     
         let _ = vigenere_encode(&processed_text, &encoded_file_name, key);
+    }
+
+    println!{"<-- coincidence -->"};
+    let coincidence_index: f32 = 1.0 / 33.0;
+    println!{"theoretical I_0:  {}", coincidence_index};
+
+    let i_m = i_m_theoretical(probabilities);
+    println!{"theoretical I_m:  {}", i_m};
+
+    let i_input = coincidence(&processed_text, alphabet);
+    println!{"I for input text (message):  {}", i_input};
+
+    for (key, key_size) in keys {
+        let encoded_file_name = format!(
+            "../text_files/vigenere_cipher/encoded_{}.txt",
+            key_size
+        );
+
+        let encoded_text = fs::read_to_string(&encoded_file_name)?;
+        let i_encoded = coincidence(&encoded_text, alphabet);
+        println!("I for key '{}' (size {}): {}", key, key_size, i_encoded);
     }
 
     Ok(())
