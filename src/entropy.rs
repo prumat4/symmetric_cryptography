@@ -20,6 +20,7 @@ fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
 
 fn letters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
     let mut count = 0;
+   
     for (_key, _value) in letter_frequencies {
         count += _value;
     }
@@ -34,6 +35,7 @@ fn count_letters_probabilities(letter_frequencies: &HashMap<char, i64>) -> HashM
     for (_key, _value) in letter_frequencies {
         probabilities.insert(*_key, (*_value as f64) / number_of_characters);
     }
+  
     probabilities
 }
 
@@ -72,6 +74,7 @@ fn get_bigram_frequency(text: &str) -> HashMap<String, i64> {
 
 fn bigram_count(bigram_frequencies: &HashMap<String, i64>) -> i64 {
     let mut count = 0;
+   
     for (_key, _value) in bigram_frequencies {
         count += _value;
     }
@@ -97,6 +100,7 @@ fn compute_h2(bigram_frequencies: &HashMap<String, i64>) -> f64 {
     for (_key, _value) in probabilities {
         h2 += _value * f64::log2(_value);
     }
+  
     h2 = -h2/2.0;
     
     h2
