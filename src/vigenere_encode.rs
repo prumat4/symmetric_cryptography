@@ -5,6 +5,7 @@ use std::fs;
 
 mod utils;
 use crate::utils::{process_file};
+use utils::coincidence;
 
 fn encode_char(c: char, key_char: char) -> char {
     let mut ans = (c as u32) + (key_char as u32) - 'а' as u32 - 'а' as u32;
@@ -50,21 +51,6 @@ fn i_m_theoretical(probabilities: Vec<f64>) -> f64 {
     }
 
     i_m
-}
-
-fn coincidence(input_text: &str, alphabet: &str) -> f64 {
-    let text: Vec<char> = input_text.chars().collect();
-    let mut sum: usize = 0;
-
-    for c in alphabet.chars() {
-        let occurrences = text.iter().filter(|&&x| x == c).count();
-        sum = sum.checked_add(occurrences.checked_mul(occurrences.checked_sub(1).unwrap_or(0)).unwrap_or(0)).unwrap_or(0);
-    }
-
-    let text_len = text.len();
-    let denominator = (text_len.checked_mul(text_len.checked_sub(1).unwrap_or(0)).unwrap_or(0)) as f64;
-
-    (sum as f64) / denominator
 }
 
 fn main() -> io::Result<()> {

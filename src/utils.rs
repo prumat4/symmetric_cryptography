@@ -152,3 +152,18 @@ pub fn process_file(input_file: &str, output_file: &str, with_spaces: bool) -> i
     
     Ok(processed_text)
 }
+
+pub fn coincidence(input_text: &str, alphabet: &str) -> f64 {
+    let text: Vec<char> = input_text.chars().collect();
+    let mut sum: usize = 0;
+
+    for c in alphabet.chars() {
+        let occurrences = text.iter().filter(|&&x| x == c).count();
+        sum = sum.checked_add(occurrences.checked_mul(occurrences.checked_sub(1).unwrap_or(0)).unwrap_or(0)).unwrap_or(0);
+    }
+
+    let text_len = text.len();
+    let denominator = (text_len.checked_mul(text_len.checked_sub(1).unwrap_or(0)).unwrap_or(0)) as f64;
+
+    (sum as f64) / denominator
+}
