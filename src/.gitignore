@@ -1,2 +1,3 @@
 entropy
-vigenere_cipher
+vigenere_encode
+vigenere_decode

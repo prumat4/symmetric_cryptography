@@ -43,13 +43,13 @@ fn vigenere_encode(input_text: &str, encoded_file: &str, key: &str) -> io::Resul
 }
 
 fn i_m_theoretical(probabilities: Vec<f64>) -> f64 {
-    let mut I_m = 0.0;
+    let mut i_m = 0.0;
     
     for prob in probabilities {
-        I_m += prob * prob;
+        i_m += prob * prob;
     }
 
-    I_m
+    i_m
 }
 
 fn coincidence(input_text: &str, alphabet: &str) -> f64 {
@@ -77,8 +77,8 @@ fn main() -> io::Result<()> {
         0.00036,
     ];
 
-    let input_file = "../text_files/vigenere_cipher/input.txt";
-    let preprocessed_file = "../text_files/vigenere_cipher/preprocessed.txt";
+    let input_file = "../text_files/vigenere_cipher/to_encode//input.txt";
+    let preprocessed_file = "../text_files/vigenere_cipher/to_encode//preprocessed.txt";
     let processed_text = process_file(input_file, preprocessed_file, false)?;
     
     let keys: [(&str, i8); 6] = [
@@ -92,7 +92,7 @@ fn main() -> io::Result<()> {
 
     for (key, key_size) in keys {
         let encoded_file_name = format!(
-            "../text_files/vigenere_cipher/encoded_{}.txt",
+            "../text_files/vigenere_cipher/to_encode//encoded_{}.txt",
             key_size
         );
     
@@ -111,7 +111,7 @@ fn main() -> io::Result<()> {
 
     for (key, key_size) in keys {
         let encoded_file_name = format!(
-            "../text_files/vigenere_cipher/encoded_{}.txt",
+            "../text_files/vigenere_cipher/to_encode/encoded_{}.txt",
             key_size
         );
 
