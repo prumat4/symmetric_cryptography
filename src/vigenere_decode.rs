@@ -16,6 +16,10 @@ const PROBABILITIES: [f64; 33] = [
     0.00036,
 ];
 
+fn calculate_expected_i(probabilities: &[f64]) -> f64 {
+    probabilities.iter().map(|&p| p.powi(2)).sum()
+}
+
 fn divide_into_blocks(text: &str, r: usize) -> Vec<String> {
     let mut blocks = Vec::new();
 
@@ -58,9 +62,12 @@ fn compute_r(processed_text: &str) -> Option<usize> {
 fn main() -> io::Result<()> {
     let input_file = "../text_files/vigenere_cipher/to_decode/input.txt";
     let preprocessed_file = "../text_files/vigenere_cipher/to_decode/preprocessed.txt";
-    let processed_text = process_file(input_file, preprocessed_file, false)?;
+    let text = process_file(input_file, preprocessed_file, false)?;
 
-    if let Some(r) = compute_r(&processed_text) {
+    let expected_i = calculate_expected_i(&PROBABILITIES);
+    println!("expected i: {}", expected_i);
+    
+    if let Some(r) = compute_r(&text) {
         println!("Closest block size to i_m: {}", r);
     }
 
