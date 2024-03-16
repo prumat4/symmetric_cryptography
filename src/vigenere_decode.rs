@@ -31,25 +31,24 @@ fn divide_into_blocks(text: &str, r: usize) -> Vec<String> {
     blocks
 }
 
-fn compute_r(processed_text: &str) -> Option<usize> {
-    let i_input = coincidence(processed_text, ALPHABET);
-    println!("I for input text (message): {}", i_input);
+fn compute_r(text: &str) -> Option<usize> {
+    let expected_i = calculate_expected_i(&PROBABILITIES);
+    println!("expected i: {}", expected_i);
 
     let mut closest_r: Option<usize> = None;
     let mut closest_coincidence = f64::MAX;
 
     for r in 2..=20 {
-        let blocks = divide_into_blocks(processed_text, r);
-
+        let blocks = divide_into_blocks(text, r);
+        
         let mut blocks_coincidence: f64 = 0.0;
         for block in &blocks {
-            blocks_coincidence += coincidence(block, ALPHABET);
+            blocks_coincidence += coincidence(block, &ALPHABET);
         }
-
+        
         let average_coincidence = blocks_coincidence / blocks.len() as f64;
-
-        let diff = (i_input - average_coincidence).abs();
-        println!("{}", diff);
+        
+        let diff = (expected_i - average_coincidence).abs();
         if diff < closest_coincidence {
             closest_r = Some(r);
             closest_coincidence = diff;
@@ -59,14 +58,13 @@ fn compute_r(processed_text: &str) -> Option<usize> {
     closest_r
 }
 
+
+
 fn main() -> io::Result<()> {
     let input_file = "../text_files/vigenere_cipher/to_decode/input.txt";
     let preprocessed_file = "../text_files/vigenere_cipher/to_decode/preprocessed.txt";
     let text = process_file(input_file, preprocessed_file, false)?;
 
-    let expected_i = calculate_expected_i(&PROBABILITIES);
-    println!("expected i: {}", expected_i);
-    
     if let Some(r) = compute_r(&text) {
         println!("Closest block size to i_m: {}", r);
     }
