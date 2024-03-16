@@ -82,6 +82,37 @@ fn crack_key_mi(text: &str, key_length: usize) -> String {
     key
 }
 
+fn decode_and_write(text: &str, key: &str) -> io::Result<()> {
+    let alphabet: Vec<char> = ALPHABET.chars().collect();
+    let mut decode_text = String::new();
+    let key_length = key.chars().count();
+
+    for (i, c) in text.chars().enumerate() {
+        if let Some(text_index) = alphabet.iter().position(|&r| r == c) {
+            let key_char = key.chars().nth(i % key_length).unwrap();
+            if let Some(key_index) = alphabet.iter().position(|&r| r == key_char) {
+                let decode_char_index = (text_index + alphabet.len() - key_index) % alphabet.len();
+                decode_text.push(alphabet[decode_char_index]);
+            } else {
+                decode_text.push(c);
+            }
+        } else {
+            decode_text.push(c);
+        }
+    }
+
+    let path = Path::new("../text_files/vigenere_cipher/to_decode/decoded.txt");
+    let mut file = File::create(&path)?;
+    file.write_all(decode_text.as_bytes())?;
+
+    Ok(())
+}
+
+// to do: 
+//     1. compute r
+//     2. find symbols of key
+//     3. decode - done 
+
 fn main() -> io::Result<()> {
     let input_file = "../text_files/vigenere_cipher/to_decode/input.txt";
     let preprocessed_file = "../text_files/vigenere_cipher/to_decode/preprocessed.txt";
@@ -91,10 +122,13 @@ fn main() -> io::Result<()> {
         println!("Closest block size to i_m: {}", r);
     }
 
-    for r in 2..30 {
-        let key = crack_key_mi(&text, r);
-        println!("key: {}: {}", r, key);
-    }
+    // for r in 2..30 {
+    let key = crack_key_mi(&text, 17);
+    println!("key: {}: {}", 17, key);
+    // }
+
+        
+    decode_and_write(&text, &key)?;
 
     Ok(())
 }
