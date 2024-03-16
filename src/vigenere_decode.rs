@@ -20,7 +20,6 @@ fn calculate_expected_i(probabilities: &[f64]) -> f64 {
     probabilities.iter().map(|&p| p.powi(2)).sum()
 }
 
-
 fn divide_into_blocks(text: &str, r: usize) -> Vec<String> {
     (0..r).map(|i| text.chars().skip(i).step_by(r).collect()).collect()
 }
@@ -52,32 +51,31 @@ fn compute_r(text: &str) -> Option<usize> {
     closest_r
 }
 
-fn crack_key_mi(text: &str, r: usize) -> String {
-    let blocks = divide_into_blocks(text, r);
+fn crack_key_mi(text: &str, key_length: usize) -> String {
+    let blocks = divide_into_blocks(text, key_length);
     let alphabet: Vec<char> = ALPHABET.chars().collect();
-    let alph_size = alphabet.len();
     let mut key = String::new();
 
-    for i in 0..r {
-        let mut k_i = 0;
-        let mut m_max = 0.0;
+    for block_index in 0..key_length {
+        let mut max_shift = 0;
+        let mut max_m = 0.0;
 
-        for g in 0..alph_size {
-            let mut try_m = 0.0;
-            for t in 0..alph_size {
-                let shift_index = (t + g) % alph_size;
-                let shift_char = alphabet[shift_index];
-                let count = blocks[i].matches(shift_char).count() as f64;
-                try_m += PROBABILITIES[t] * count;
+        for g in 0..alphabet.len() {
+            let mut current_m = 0.0;
+            for t in 0..alphabet.len() {
+                let shift_index = (t + g) % alphabet.len();
+                let shifted_char = alphabet[shift_index];
+                let char_count = blocks[block_index].matches(shifted_char).count() as f64;
+                current_m += PROBABILITIES[t] * char_count;
             }
 
-            if try_m > m_max {
-                m_max = try_m;
-                k_i = g;
+            if current_m > max_m {
+                max_m = current_m;
+                max_shift = g;
             }
         }
 
-        key.push(alphabet[k_i]);
+        key.push(alphabet[max_shift]);
     }
 
     key
