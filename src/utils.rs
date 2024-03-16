@@ -32,6 +32,16 @@ pub fn remove_spaces(text: &str) -> String {
     text.chars().filter(|&c| c != ' ' && c != '\n' && c != '\0').collect()
 }
 
+pub fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
+    let mut frequencies: HashMap<char, i64> = HashMap::new();
+
+    for c in text.chars() {
+        *frequencies.entry(c).or_insert(0) += 1;
+    }
+
+    frequencies
+}
+
 pub fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
     let mut letters: Vec<char> = bigram_frequencies.keys().flat_map(|s| s.chars()).collect::<Vec<char>>();
     

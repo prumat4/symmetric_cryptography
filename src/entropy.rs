@@ -7,16 +7,8 @@ mod utils;
 use crate::utils::{process_file};
 use crate::utils::{print_letter_frequencies, print_letters_probabilities};
 use crate::utils::{print_bigram_frequencies, print_bigram_probabilities};
+use crate::utils::{get_letter_frequency};
 
-fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
-    let mut frequencies: HashMap<char, i64> = HashMap::new();
-
-    for c in text.chars() {
-        *frequencies.entry(c).or_insert(0) += 1;
-    }
-
-    frequencies
-}
 
 fn letters_count(letter_frequencies: &HashMap<char, i64>) -> i64 {
     let mut count = 0;
