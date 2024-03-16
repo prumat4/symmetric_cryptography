@@ -21,6 +21,7 @@ fn calculate_expected_i(probabilities: &[f64]) -> f64 {
 }
 
 fn divide_into_blocks(text: &str, r: usize) -> Vec<String> {
+    // love it :))
     (0..r).map(|i| text.chars().skip(i).step_by(r).collect()).collect()
 }
 
@@ -90,10 +91,7 @@ fn main() -> io::Result<()> {
         println!("Closest block size to i_m: {}", r);
     }
 
-
-    // let key = crack_key_mi(&text, 4);
-
-    for r in 2..50 {
+    for r in 2..30 {
         let key = crack_key_mi(&text, r);
         println!("key: {}: {}", r, key);
     }
