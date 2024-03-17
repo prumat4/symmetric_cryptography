@@ -3,10 +3,12 @@ use std::io::{self, BufRead, BufReader, Write};
 use File;
 use Path;
 
+#[allow(dead_code)]
 pub fn is_cyrillic(c: &char) -> bool {
     (*c as u32) >= 0x0400 && (*c as u32) <= 0x04FF
 }
 
+#[allow(dead_code)]
 pub fn preprocess_text(text: &str) -> Option<String> {
     let mut processed_text = String::new();
     
@@ -28,10 +30,12 @@ pub fn preprocess_text(text: &str) -> Option<String> {
     }
 }
 
+#[allow(dead_code)]
 pub fn remove_spaces(text: &str) -> String {
     text.chars().filter(|&c| c != ' ' && c != '\n' && c != '\0').collect()
 }
 
+#[allow(dead_code)]
 pub fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     let mut frequencies: HashMap<char, i64> = HashMap::new();
 
@@ -42,6 +46,7 @@ pub fn get_letter_frequency(text: &str) -> HashMap<char, i64> {
     frequencies
 }
 
+#[allow(dead_code)]
 pub fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
     let mut letters: Vec<char> = bigram_frequencies.keys().flat_map(|s| s.chars()).collect::<Vec<char>>();
     
@@ -74,6 +79,7 @@ pub fn print_bigram_frequencies(bigram_frequencies: &HashMap<String, i64>) {
     println!();
 }
 
+#[allow(dead_code)]
 pub fn print_bigram_probabilities(bigram_frequencies: &HashMap<String, f64>) {
     let mut letters: Vec<char> = bigram_frequencies.keys().flat_map(|s| s.chars()).collect::<Vec<char>>();
     
@@ -106,6 +112,7 @@ pub fn print_bigram_probabilities(bigram_frequencies: &HashMap<String, f64>) {
     println!();
 }
 
+#[allow(dead_code)]
 pub fn print_letters_probabilities(probabilities: &HashMap<char, f64>) {
     let mut sorted_probabilities: Vec<(&char, &f64)> = probabilities.iter().collect();
     sorted_probabilities.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap());
@@ -117,6 +124,7 @@ pub fn print_letters_probabilities(probabilities: &HashMap<char, f64>) {
     println!();
 }
 
+#[allow(dead_code)]
 pub fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
     let mut sorted_frequencies: Vec<(&char, &i64)> = letter_frequencies.iter().collect();
     sorted_frequencies.sort_by_key(|&(_, frequency)| *frequency);
@@ -128,6 +136,7 @@ pub fn print_letter_frequencies(letter_frequencies: &HashMap<char, i64>) {
     println!();
 }
 
+#[allow(dead_code)]
 pub fn process_file(input_file: &str, output_file: &str, with_spaces: bool) -> io::Result<String> {
     let file = File::open(input_file)?;
     let path = Path::new(output_file);
@@ -163,6 +172,7 @@ pub fn process_file(input_file: &str, output_file: &str, with_spaces: bool) -> i
     Ok(processed_text)
 }
 
+#[allow(dead_code)]
 pub fn coincidence(input_text: &str, alphabet: &str) -> f64 {
     let text: Vec<char> = input_text.chars().collect();
     let mut sum: usize = 0;

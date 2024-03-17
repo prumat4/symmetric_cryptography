@@ -2,11 +2,9 @@ use std::fs;
 use fs::File;
 use std::io::{self, Write};
 use std::path::Path;
-use std::collections::HashMap;
 
 mod utils;
 use utils::{process_file, coincidence};
-use crate::utils::{get_letter_frequency, print_letter_frequencies};
 
 const ALPHABET: &str = "абвгдежзийклмнопрстуфхцчшщъыьэюя";
 const PROBABILITIES: [f64; 32] = 
