@@ -1,13 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage[english,ukrainian]{babel}
 \usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage[utf8]{inputenc}
-\usepackage{multirow}
+\usepackage{amsmath, graphicx, booktabs, listings, xcolor, inputenc, multirow, hyperref, pgfplots}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -34,8 +28,6 @@
 }
 
 \lstset{style=mystyle}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
-\usepackage{pgfplots}
 \pgfplotsset{compat=1.17}
 
 \title{\textbf{Експериментальна оцінка ентропії на символ джерела відкритого тексту}}
@@ -44,6 +36,7 @@
 
 \begin{document}
 \maketitle
+
 \section{Мета роботи}
 \quad Засвоєння понять ентропії на символ джерела та його надлишковості, вивчення та порівняння різних моделей джерела відкритого тексту для наближеного визначення ентропії, набуття практичних навичок щодо оцінки ентропії на символ джерела.
 

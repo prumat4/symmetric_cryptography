@@ -43,7 +43,6 @@ fn compute_r(text: &str) -> Option<usize> {
         }
         
         let average_coincidence = blocks_coincidence / blocks.len() as f64;
-        
         let diff = (expected_i - average_coincidence).abs();
         if diff < closest_coincidence {
             closest_r = Some(r);
