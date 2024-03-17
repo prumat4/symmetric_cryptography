@@ -14,6 +14,10 @@ const PROBABILITIES: [f64; 32] =
       0.01458, 0.00681, 0.00330, 0.01808, 0.01752, 0.00425, 0.00735, 0.01818,
       0.00036];
 
+const INPUT_FILE: &str = "../text_files/vigenere_cipher/to_decode/input.txt";
+const PREPROCESSED_FILE: &str = "../text_files/vigenere_cipher/to_decode/preprocessed.txt";
+const DECODED_FILE_PATH: &str = "../text_files/vigenere_cipher/to_decode/decoded.txt";
+
 fn calculate_expected_i(probabilities: &[f64]) -> f64 {
     probabilities.iter().map(|&p| p.powi(2)).sum()
 }
@@ -48,6 +52,36 @@ fn compute_r(text: &str) -> Option<usize> {
     }
 
     closest_r
+}
+
+fn find_most_frequent_letter() -> char {
+    PROBABILITIES.iter().enumerate().max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+        .map(|(idx, _)| ALPHABET.chars().nth(idx).unwrap_or_default()) 
+        .unwrap_or_default()
+}
+
+fn determine_key_characters(text: &str, r: usize) -> String {
+    let blocks = divide_into_blocks(text, r);
+    let most_frequent_language_letter = find_most_frequent_letter();
+    let most_frequent_language_letter_index = ALPHABET.chars().position(|c| c == most_frequent_language_letter).unwrap_or_default();
+    let mut key = String::with_capacity(r);
+
+    for block in blocks {
+        let mut letter_frequencies = std::collections::HashMap::new();
+        for letter in block.chars() {
+            *letter_frequencies.entry(letter).or_insert(0) += 1;
+        }
+
+        if let Some((&most_frequent_block_letter, _)) = letter_frequencies.iter().max_by_key(|&(_, &count)| count) {
+            let block_letter_index = ALPHABET.chars().position(|c| c == most_frequent_block_letter).unwrap_or_default();
+            let shift = (block_letter_index + ALPHABET.len() - most_frequent_language_letter_index) % ALPHABET.len();
+            key.push(ALPHABET.chars().nth(shift).unwrap_or('а'));
+        } else {
+            key.push('а');
+        }
+    }
+
+    key
 }
 
 fn crack_key_mi(text: &str, key_length: usize) -> String {
@@ -99,34 +133,28 @@ fn decode_and_write(text: &str, key: &str) -> io::Result<()> {
         }
     }
 
-    let path = Path::new("../text_files/vigenere_cipher/to_decode/decoded.txt");
+    let path = Path::new(DECODED_FILE_PATH);
     let mut file = File::create(&path)?;
     file.write_all(decode_text.as_bytes())?;
 
     Ok(())
 }
 
-// to do: 
-//     1. compute r
-//     2. find symbols of key
-//     3. decode - done 
-
 fn main() -> io::Result<()> {
-    let input_file = "../text_files/vigenere_cipher/to_decode/input.txt";
-    let preprocessed_file = "../text_files/vigenere_cipher/to_decode/preprocessed.txt";
-    let text = process_file(input_file, preprocessed_file, false)?;
+    let text = process_file(INPUT_FILE, PREPROCESSED_FILE, false)?;
+    println!("Text processing completed.");
 
-    if let Some(r) = compute_r(&text) {
-        println!("Closest block size to i_m: {}", r);
-    }
+    let r = compute_r(&text).expect("Failed to compute key length.");
+    println!("Optimal key length (r) found: {}", r);
 
-    // for r in 2..30 {
-    let key = crack_key_mi(&text, 17);
-    println!("key: {}: {}", 17, key);
-    // }
+    let key_frequency = determine_key_characters(&text, r);
+    println!("Key determined by frequency method: {}", key_frequency);
 
-        
-    decode_and_write(&text, &key)?;
+    let key_mi = crack_key_mi(&text, r);
+    println!("Key determined by m_i method: {}", key_mi);
+
+    decode_and_write(&text, &key_mi)?;
+    println!("Text deciphered using m_i method key and written to file.");
 
     Ok(())
 }
