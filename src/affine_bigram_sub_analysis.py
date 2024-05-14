@@ -119,7 +119,7 @@ def coincidence_index(input_text):
     n = len(input_text)
     return frequency_sum / (n * (n - 1)) if n > 1 else 0
 
-def compute_text_rate(text_analysis, complexity_level=5):
+def compute_text_rate(text_analysis):
     frequencies = count_chars(text_analysis)
     rank_size = 4
     score = 0.0
@@ -127,19 +127,13 @@ def compute_text_rate(text_analysis, complexity_level=5):
     top_characters = {frequencies[i][0] for i in range(-1, -rank_size - 1, -1)}
     score += 1 if {'о', 'е', 'а'} & top_characters else 0
 
-    if complexity_level <= 1:
-        return score
-
     bottom_characters = {frequencies[i][0] for i in range(rank_size)}
     score += 1 if {'ф', 'ц', 'щ'} & bottom_characters else 0
-
-    if complexity_level <= 2:
-        return score
 
     deviation = abs(coincidence_index(text_analysis) - EXPECTED_I) * 200
     score -= deviation
 
-    return score if complexity_level <= 3 else score
+    return score
 
 
 def main():
