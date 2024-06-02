@@ -14,9 +14,9 @@ const PROBABILITIES: [f64; 32] =
       0.01458, 0.00681, 0.00330, 0.01808, 0.01752, 0.00425, 0.00735, 0.01818,
       0.00036];
 
-const INPUT_FILE: &str = "../text_files/vigenere_cipher/to_decode/input.txt";
-const PREPROCESSED_FILE: &str = "../text_files/vigenere_cipher/to_decode/preprocessed.txt";
-const DECODED_FILE_PATH: &str = "../text_files/vigenere_cipher/to_decode/decoded.txt";
+const INPUT_FILE: &str = "../../text_files/vigenere_cipher/to_decode/input.txt";
+const PREPROCESSED_FILE: &str = "../../text_files/vigenere_cipher/to_decode/preprocessed.txt";
+const DECODED_FILE_PATH: &str = "../../text_files/vigenere_cipher/to_decode/decoded.txt";
 
 fn calculate_expected_i(probabilities: &[f64]) -> f64 {
     probabilities.iter().map(|&p| p.powi(2)).sum()

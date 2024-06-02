@@ -1,0 +1,23 @@
+[package]
+name = "symmetric_crypto"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rayon = "1.5"
+
+[[bin]]
+name = "entropy"
+path = "bin/entropy.rs"
+
+[[bin]]
+name = "geffe"
+path = "bin/geffe.rs"
+
+[[bin]]
+name = "vigenere_decode"
+path = "bin/vigenere_decode.rs"
+
+[[bin]]
+name = "vigenere_encode"
+path = "bin/vigenere_encode.rs"

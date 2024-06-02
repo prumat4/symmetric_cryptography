@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Write};
+use std::io::{self, Write};
 use std::path::Path;
 use std::fs;
 
@@ -63,8 +63,8 @@ fn main() -> io::Result<()> {
         0.00036,
     ];
 
-    let input_file = "../text_files/vigenere_cipher/to_encode//input.txt";
-    let preprocessed_file = "../text_files/vigenere_cipher/to_encode//preprocessed.txt";
+    let input_file = "../../text_files/vigenere_cipher/to_encode//input.txt";
+    let preprocessed_file = "../../text_files/vigenere_cipher/to_encode//preprocessed.txt";
     let processed_text = process_file(input_file, preprocessed_file, false)?;
     
     let keys: [(&str, i8); 6] = [
@@ -78,7 +78,7 @@ fn main() -> io::Result<()> {
 
     for (key, key_size) in keys {
         let encoded_file_name = format!(
-            "../text_files/vigenere_cipher/to_encode//encoded_{}.txt",
+            "../../text_files/vigenere_cipher/to_encode//encoded_{}.txt",
             key_size
         );
     
@@ -97,7 +97,7 @@ fn main() -> io::Result<()> {
 
     for (key, key_size) in keys {
         let encoded_file_name = format!(
-            "../text_files/vigenere_cipher/to_encode/encoded_{}.txt",
+            "../../text_files/vigenere_cipher/to_encode/encoded_{}.txt",
             key_size
         );
 
