@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
-use File;
-use Path;
+use std::path::Path;
 
 #[allow(dead_code)]
 pub fn is_cyrillic(c: &char) -> bool {
