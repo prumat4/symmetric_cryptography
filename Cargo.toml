@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 rayon = "1.5.1"
+structopt = "0.3.26"
 
 [[bin]]
 name = "entropy"
