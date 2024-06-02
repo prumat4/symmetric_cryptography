@@ -1,3 +1,2 @@
-src/*.rs linguist-detectable=true
-
-reports/*.tex linguist-detectable=false
+* linguist-vendored
+*.rs linguist-vendored=false
